@@ -1,0 +1,6 @@
+infrastructure:
+  type: "DefaultInfrastructureManager"
+policy:
+  type: "StaticPolicy"
+  userAccessType: "ALL"
+  providerAccessType: "ME"
