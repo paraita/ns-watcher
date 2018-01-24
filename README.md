@@ -1,8 +1,10 @@
 # ns-watcher
 
+This project allows to add nodesources to a ProActive Resource Manager by adding well-formed yml files into a specified folder.
+It's purpose is to ease frequent adds and removals of node sources and is **NOT** ready for a production use.
+
 ## Requirements
 
-This project allows to add nodesources to a ProActive Resource Manager by adding well-formed yml files into a specified folder.
 For this, the project assumes the following:
 
 * we have credentials for the RM
