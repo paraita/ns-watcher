@@ -1,5 +1,7 @@
 # ns-watcher
 
+## Requirements
+
 This project allows to add nodesources to a ProActive Resource Manager by adding well-formed yml files into a specified folder.
 For this, the project assumes the following:
 
@@ -8,9 +10,16 @@ For this, the project assumes the following:
 * the proactive-client script is reachable
 * the scheduler REST API is reachable
 
+There's a requirements.txt file for the dependencies.
+
+## Configuration
+
 This project needs a `ns-watcher.conf` in the project directory. See the `ns-watcher.template.conf` file.
 
-an NS declaration file should have the following format:
+## Usage
+
+Just run the main.py script from within this project.
+An NS declaration file should have the following format:
 
 ```yaml
 infrastructure:
