@@ -17,6 +17,25 @@ There's a requirements.txt file for the dependencies.
 ## Configuration
 
 This project needs a `ns-watcher.conf` in the project directory. See the `ns-watcher.template.conf` file.
+At the moment, only the StaticPolicy is supported.
+
+Supported infrastructures:
+- [ ] AzureInfrastructure
+- [ ] LocalInfrastructure
+- [ ] AWSEC2Infrastructure
+- [ ] CLIInfrastructure
+- [ ] AutoUpdateInfrastructure
+- [ ] OpenstackInfrastructure
+- [x] DefaultInfrastructureManager
+- [ ] SSHInfrastructure
+- [ ] VMWareInfrastructure
+- [x] AzureVMScaleSetInfrastructure
+- [ ] GenericBatchJobInfrastructure
+- [ ] NativeSchedulerInfrastructure
+- [ ] SSHInfrastructureV2
+- [ ] LSFInfrastructure
+- [ ] PBSInfrastructure
+
 
 ## Usage
 

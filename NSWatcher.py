@@ -36,6 +36,14 @@ class NSWatcher(FileSystemEventHandler):
         logging.info(cmd)
         subprocess.check_call(cmd, shell=True)
 
+    # TODO:
+    def build_infra_cmd(self, ns_name, infra):
+        return ""
+
+    # TODO:
+    def build_policy_cmd(self, cmd, policy):
+        return ""
+
     def create_azure_vm_ss_infra(self, name, ns_config):
         infra = self._sanitize(ns_config['infrastructure'])
         policy = ns_config['policy']
@@ -69,12 +77,19 @@ class NSWatcher(FileSystemEventHandler):
         logging.info(cmd)
         subprocess.check_call(cmd, shell=True)
 
+    def execute_command(self, cmd):
+        pass
+
     def on_created(self, event):
         if self.is_valid_file(event):
             ns_name = self.get_ns_name(event)
             ns_to_create = yaml.load(open(event.src_path, 'r'))
+            infra = ns_to_create['infrastructure']
+            policy = ns_to_create['policy']
             logging.info(f"Analyzing file {event.src_path}")
-            self.create_ns(ns_name, ns_to_create)
+            cmd = self.build_infra_cmd(ns_name, infra)
+            cmd = self.build_policy_cmd(cmd, policy)
+            self.create_ns(cmd)
 
     def on_deleted(self, event):
         ns_name = self.get_ns_name(event)
@@ -93,7 +108,6 @@ class NSWatcher(FileSystemEventHandler):
         req = request.Request(f"{self.url_rm_ns}", headers=headers, data=data)
         request.urlopen(req).read()
         logging.info(f"Removed {ns_name}")
-
 
     def create_ns(self, ns_name, ns_to_create):
         ns_type = ns_to_create['infrastructure']['type']
