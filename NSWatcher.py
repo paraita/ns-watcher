@@ -4,6 +4,7 @@ from os.path import basename
 import subprocess
 import yaml
 from urllib import request, parse
+from urllib.error import HTTPError
 
 
 class NSWatcher(FileSystemEventHandler):
@@ -78,7 +79,10 @@ class NSWatcher(FileSystemEventHandler):
         }
         data = parse.urlencode({'name': ns_name}).encode()
         req = request.Request(f"{self.url_rm_ns}", headers=headers, data=data)
-        request.urlopen(req).read()
+        try:
+            request.urlopen(req).read()
+        except HTTPError as err:
+            logging.error(f"Removing of {ns_name} failed: {err}")
         logging.info(f"Removed {ns_name}")
 
     @staticmethod
@@ -91,6 +95,7 @@ class NSWatcher(FileSystemEventHandler):
     def create_azure_vm_ss_infra(infra):
         cmd = f"org.ow2.proactive.resourcemanager.nodesource.infrastructure.{infra['type']}" \
               f" {infra['azureCredentialFile']}" \
+              f" '{infra['customResourceGroupName']}'" \
               f" '{infra['maxVms']}'" \
               f" '{infra['maxNodesPerVM']}'" \
               f" '{infra['machineType']}'" \
