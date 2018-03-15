@@ -2,7 +2,7 @@
 
 import time
 from watchdog.observers import Observer
-from NSWatcher import NSWatcher
+from nswatcher import NSWatcher
 import logging
 
 
