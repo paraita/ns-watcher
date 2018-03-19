@@ -10,7 +10,7 @@ from urllib.error import HTTPError
 
 class NSWatcher(FileSystemEventHandler):
 
-    def __init__(self, config_path="ns-watcher.conf"):
+    def __init__(self, config_path="ns-watcher.conf", debug=False):
         with open(config_path, 'r') as config_file:
             watcher_conf = yaml.load(config_file)
             self.pa_home = watcher_conf['pa_home']
@@ -21,6 +21,7 @@ class NSWatcher(FileSystemEventHandler):
             self.rest_password = watcher_conf['rest_password']
             self.url_login = f"{watcher_conf['scheduler_url']}/rest/scheduler/login"
             self.url_rm_ns = f"{watcher_conf['scheduler_url']}/rest/rm/nodesource/remove"
+            self.verbose = debug
 
     def build_cli_cmd(self):
         insecure_mode = ""
@@ -35,7 +36,7 @@ class NSWatcher(FileSystemEventHandler):
         infra_type = infra['type']
         try:
             module_path = f"nswatcher.infrastructures.{infra_type}"
-            logging.info(f"module to load: {module_path}")
+            logging.debug(f"module to load: {module_path}")
             infra_module = import_module(module_path)
             cmd = infra_module.build_infra_cmd(infra)
         except ImportError:
@@ -48,7 +49,7 @@ class NSWatcher(FileSystemEventHandler):
         policy_type = policy['type']
         try:
             module_path = f"nswatcher.policies.{policy_type}"
-            logging.info(f"module to load: {module_path}")
+            logging.debug(f"module to load: {module_path}")
             policy_module = import_module(module_path)
             cmd = policy_module.build_policy_cmd(policy)
         except ImportError:
@@ -61,15 +62,22 @@ class NSWatcher(FileSystemEventHandler):
             ns_to_create = yaml.load(open(event.src_path, 'r'))
             infra = self._sanitize(ns_to_create['infrastructure'])
             policy = self._sanitize(ns_to_create['policy'])
-            logging.info(f"Analyzing file {event.src_path}")
+            logging.debug(f"Analyzing file {event.src_path}")
             cmd_starter = self.build_cli_cmd()
             infra_cmd = self.build_infra_cmd(infra)
             policy_cmd = self.build_policy_cmd(policy)
             cmd = f"{cmd_starter} -createns {ns_name}" \
                   f" --infrastructure {infra_cmd}" \
                   f" -policy {policy_cmd}"
-            logging.info(cmd)
-            subprocess.check_call(cmd, shell=True)
+            logging.debug(cmd)
+            std_output = subprocess.DEVNULL
+            if self.verbose:
+                std_output = subprocess.STDOUT
+            try:
+                subprocess.check_call(cmd, stdout=std_output, stderr=std_output, shell=True)
+                logging.info(f"Created nodesource {ns_name} ({infra['type']}, {infra['type']})")
+            except subprocess.CalledProcessError as err:
+                logging.error("Command failed with error %s" % err)
 
     def on_deleted(self, event):
         ns_name = self.get_ns_name(event)
