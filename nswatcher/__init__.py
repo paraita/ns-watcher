@@ -6,11 +6,12 @@ import subprocess
 import yaml
 from urllib import request, parse
 from urllib.error import HTTPError
+from pathlib import Path
 
 
 class NSWatcher(FileSystemEventHandler):
 
-    def __init__(self, config_path="ns-watcher.conf", debug=False, logger=None):
+    def __init__(self, config_path=f"{Path.home()}/.ns-watcher.conf", debug=False, logger=None):
         with open(config_path, 'r') as config_file:
             watcher_conf = yaml.load(config_file)
             self.logger = logger or logging.getLogger(__name__)
@@ -69,11 +70,11 @@ class NSWatcher(FileSystemEventHandler):
                   f" --infrastructure {infra_cmd}" \
                   f" -policy {policy_cmd}"
             self.logger.debug(cmd)
-            std_output = subprocess.DEVNULL
+            stdout = subprocess.DEVNULL
             if self.verbose:
-                std_output = subprocess.STDOUT
+                stdout = subprocess.PIPE
             try:
-                subprocess.check_call(cmd, stdout=std_output, stderr=std_output, shell=True)
+                subprocess.check_call(cmd, stdout=stdout, shell=True)
                 self.logger.info(f"Created nodesource {ns_name} ({infra['type']}, {infra['type']})")
             except subprocess.CalledProcessError as err:
                 self.logger.error("Command failed with error %s" % err)
