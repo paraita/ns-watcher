@@ -16,7 +16,7 @@ def parse_args(argv):
 
 def setup_logging(loglevel):
     logging.basicConfig(level=loglevel,
-                        format='%(asctime)s - %(filename)s - %(message)s',
+                        format='%(asctime)s - %(name)s - %(message)s',
                         datefmt='%d/%m/%Y %H:%M:%S')
 
 

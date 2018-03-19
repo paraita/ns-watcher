@@ -10,9 +10,10 @@ from urllib.error import HTTPError
 
 class NSWatcher(FileSystemEventHandler):
 
-    def __init__(self, config_path="ns-watcher.conf", debug=False):
+    def __init__(self, config_path="ns-watcher.conf", debug=False, logger=None):
         with open(config_path, 'r') as config_file:
             watcher_conf = yaml.load(config_file)
+            self.logger = logger or logging.getLogger(__name__)
             self.pa_home = watcher_conf['pa_home']
             self.scheduler_url = watcher_conf['scheduler_url']
             self.credential_file_path = watcher_conf['credential_file_path']
@@ -30,30 +31,28 @@ class NSWatcher(FileSystemEventHandler):
         return f"{self.pa_home}/bin/proactive-client {insecure_mode} -u {self.scheduler_url}/rest" \
                f" -c {self.credential_file_path}"
 
-    @staticmethod
-    def build_infra_cmd(infra):
+    def build_infra_cmd(self, infra):
         cmd = ""
         infra_type = infra['type']
         try:
             module_path = f"nswatcher.infrastructures.{infra_type}"
-            logging.debug(f"module to load: {module_path}")
+            self.logger.debug(f"module to load: {module_path}")
             infra_module = import_module(module_path)
             cmd = infra_module.build_infra_cmd(infra)
         except ImportError:
-            logging.error(f"failed to import module {infra_type}")
+            self.logger.error(f"failed to import module {infra_type}")
         return cmd
 
-    @staticmethod
-    def build_policy_cmd(policy):
+    def build_policy_cmd(self, policy):
         cmd = ""
         policy_type = policy['type']
         try:
             module_path = f"nswatcher.policies.{policy_type}"
-            logging.debug(f"module to load: {module_path}")
+            self.logger.debug(f"module to load: {module_path}")
             policy_module = import_module(module_path)
             cmd = policy_module.build_policy_cmd(policy)
         except ImportError:
-            logging.error(f"failed to import module {policy_type}")
+            self.logger.error(f"failed to import module {policy_type}")
         return cmd
 
     def on_created(self, event):
@@ -62,22 +61,22 @@ class NSWatcher(FileSystemEventHandler):
             ns_to_create = yaml.load(open(event.src_path, 'r'))
             infra = self._sanitize(ns_to_create['infrastructure'])
             policy = self._sanitize(ns_to_create['policy'])
-            logging.debug(f"Analyzing file {event.src_path}")
+            self.logger.debug(f"Analyzing file {event.src_path}")
             cmd_starter = self.build_cli_cmd()
             infra_cmd = self.build_infra_cmd(infra)
             policy_cmd = self.build_policy_cmd(policy)
             cmd = f"{cmd_starter} -createns {ns_name}" \
                   f" --infrastructure {infra_cmd}" \
                   f" -policy {policy_cmd}"
-            logging.debug(cmd)
+            self.logger.debug(cmd)
             std_output = subprocess.DEVNULL
             if self.verbose:
                 std_output = subprocess.STDOUT
             try:
                 subprocess.check_call(cmd, stdout=std_output, stderr=std_output, shell=True)
-                logging.info(f"Created nodesource {ns_name} ({infra['type']}, {infra['type']})")
+                self.logger.info(f"Created nodesource {ns_name} ({infra['type']}, {infra['type']})")
             except subprocess.CalledProcessError as err:
-                logging.error("Command failed with error %s" % err)
+                self.logger.error("Command failed with error %s" % err)
 
     def on_deleted(self, event):
         ns_name = self.get_ns_name(event)
@@ -98,7 +97,7 @@ class NSWatcher(FileSystemEventHandler):
             request.urlopen(req).read()
         except HTTPError as err:
             logging.error(f"Removing of {ns_name} failed: {err}")
-        logging.info(f"Removed {ns_name}")
+        self.logger.info(f"Removed {ns_name}")
 
     @staticmethod
     def create_static_policy(policy):
