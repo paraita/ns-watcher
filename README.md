@@ -16,7 +16,8 @@ There's a requirements.txt file for the dependencies.
 
 ## Configuration
 
-This project needs a `ns-watcher.conf` in the project directory. See the `ns-watcher.template.conf` file.
+This project needs a `ns-watcher.conf` in your home directory. This file can be overriden if specified on the command line.
+See the `ns-watcher.template.conf` file.
 At the moment, only the StaticPolicy is supported.
 
 Supported infrastructures:
@@ -36,10 +37,28 @@ Supported infrastructures:
 - [ ] LSFInfrastructure
 - [ ] PBSInfrastructure
 
+Supported policies:
+- [ ] SimpleJMXNodeSourcePolicy
+- [ ] TimeSlotPolicy
+- [x] StaticPolicy
+- [ ] CronLoadBasedPolicy
+- [ ] SchedulerLoadingPolicy
+- [ ] ReleaseResourcesWhenSchedulerIdle
+- [ ] NativeSchedulerPolicy
+- [ ] CronSlotLoadBasedPolicy
+- [ ] RestartDownNodesPolicy
+- [ ] CronPolicy
 
 ## Usage
 
-Just run the main.py script from within this project.
+Not ready to be run as a regular bin at the moment.
+
+To test run your dev copy, run the following command instead:
+
+```bash
+python -m nswatcher.main
+```
+
 An NS declaration file should have the following format:
 
 ```yaml
@@ -52,4 +71,6 @@ policy:
 ```
 
 Adding such a file to the watch-folder will create the node source in the RM.
-Removing that file will also remove the node souce from the RM.
+Removing that file will also remove the node source from the RM.
+
+Run a `python `
