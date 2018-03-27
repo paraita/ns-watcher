@@ -81,6 +81,7 @@ class NSWatcher(FileSystemEventHandler):
 
     def on_deleted(self, event):
         ns_name = self.get_ns_name(event)
+        cmd_starter = self.build_cli_cmd()
         cmd = f"{cmd_starter} -r {ns_name}"
         self.logger.debug(cmd)
         stdout = subprocess.DEVNULL
