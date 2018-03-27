@@ -4,8 +4,6 @@ from os.path import basename
 from importlib import import_module
 import subprocess
 import yaml
-from urllib import request, parse
-from urllib.error import HTTPError
 from pathlib import Path
 
 DEFAULT_CFG_PATH = f"{Path.home()}/.ns-watcher.conf"
@@ -79,32 +77,20 @@ class NSWatcher(FileSystemEventHandler):
                 subprocess.check_call(cmd, stdout=stdout, stderr=stdout, shell=True)
                 self.logger.info(f"Created nodesource {ns_name} ({infra['type']}, {infra['type']})")
             except subprocess.CalledProcessError as err:
-                self.logger.error("Command failed with error %s" % err)
+                self.logger.error(f"Creation of {ns_name} failed: {err}")
 
     def on_deleted(self, event):
         ns_name = self.get_ns_name(event)
-        auth_payload = {
-            'username': self.rest_user,
-            'password': self.rest_password
-        }
-        data = parse.urlencode(auth_payload).encode()
-        req = request.Request(f"{self.url_login}", data=data)
-        session_id = ''
+        cmd = f"{cmd_starter} -r {ns_name}"
+        self.logger.debug(cmd)
+        stdout = subprocess.DEVNULL
+        if self.verbose:
+            stdout = subprocess.PIPE
         try:
-            session_id = request.urlopen(req).read()
-        except HTTPError as err:
-            self.logger.error(f"Authenticating to the RM failed: {err}")
-        headers = {
-            'sessionid': session_id,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-        data = parse.urlencode({'name': ns_name}).encode()
-        req = request.Request(f"{self.url_rm_ns}", headers=headers, data=data)
-        try:
-            request.urlopen(req).read()
-        except HTTPError as err:
+            subprocess.check_call(cmd, stdout=stdout, stderr=stdout, shell=True)
+            self.logger.info(f"Deleted nodesource {ns_name}")
+        except subprocess.CalledProcessError as err:
             self.logger.error(f"Removing of {ns_name} failed: {err}")
-        self.logger.info(f"Removed {ns_name}")
 
     def _sanitize(self, obj):
         for name, value in obj.items():
