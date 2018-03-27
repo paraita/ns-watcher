@@ -14,6 +14,7 @@ def build_infra_cmd(infra):
           f" '{infra['azureRegion']}'" \
           f" '{infra['rmurl']}'" \
           f" '{infra['rmCredentials']}'" \
+          f" '{infra['deploymentTimeout']}'" \
           f" '{infra['cleaningDelay']}'" \
           f" '{infra['externalStorageAccount']}'" \
           f" '{infra['userCustomStartupScriptUrl']}'" \
