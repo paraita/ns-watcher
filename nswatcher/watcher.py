@@ -1,10 +1,10 @@
 import logging
-from watchdog.events import FileSystemEventHandler
+import subprocess
 from os.path import basename
 from importlib import import_module
-import subprocess
-import yaml
 from pathlib import Path
+from watchdog.events import FileSystemEventHandler
+import yaml
 
 DEFAULT_CFG_PATH = f"{Path.home()}/.ns-watcher.conf"
 
@@ -19,10 +19,6 @@ class NSWatcher(FileSystemEventHandler):
             self.scheduler_url = watcher_conf['scheduler_url']
             self.credential_file_path = watcher_conf['credential_file_path']
             self.watch_folder = watcher_conf['watch_folder']
-            self.rest_user = watcher_conf['rest_user']
-            self.rest_password = watcher_conf['rest_password']
-            self.url_login = f"{watcher_conf['scheduler_url']}/rest/scheduler/login"
-            self.url_rm_ns = f"{watcher_conf['scheduler_url']}/rest/rm/nodesource/remove"
             self.verbose = debug
 
     def build_cli_cmd(self):

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
+from pathlib import Path
 import time
-from watchdog.observers import Observer
 import logging
 import argparse
+from watchdog.observers import Observer
 from .watcher import NSWatcher
 from .watcher import DEFAULT_CFG_PATH
-from pathlib import Path
 
 
 def parse_args(argv):
@@ -23,8 +23,7 @@ def get_config(given_cfg_path):
     elif Path(DEFAULT_CFG_PATH).is_file():
         logging.debug(f"Default config file {DEFAULT_CFG_PATH} will be used")
         return DEFAULT_CFG_PATH
-    else:
-        return None
+    return None
 
 
 def setup_logging(loglevel):
