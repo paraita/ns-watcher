@@ -8,7 +8,6 @@ It's purpose is to ease frequent adds and removals of node sources and is **NOT*
 For this, the project assumes the following:
 
 * we have credentials for the RM
-* we have a login/password for the REST API
 * the proactive-client script is reachable
 * the scheduler REST API is reachable
 
@@ -73,4 +72,4 @@ policy:
 Adding such a file to the watch-folder will create the node source in the RM.
 Removing that file will also remove the node source from the RM.
 
-Run a `python `
+Run a `python -m nswatcher.main -v` to try.
