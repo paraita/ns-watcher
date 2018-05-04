@@ -21,7 +21,7 @@ At the moment, only the StaticPolicy is supported.
 
 Supported infrastructures:
 - [ ] AzureInfrastructure
-- [ ] LocalInfrastructure
+- [x] LocalInfrastructure
 - [ ] AWSEC2Infrastructure
 - [ ] CLIInfrastructure
 - [ ] AutoUpdateInfrastructure
