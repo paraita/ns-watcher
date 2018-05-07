@@ -4,6 +4,7 @@ from pathlib import Path
 import time
 import logging
 import argparse
+import yaml
 from watchdog.observers import Observer
 from .watcher import NSWatcher
 from .watcher import DEFAULT_CFG_PATH
@@ -26,6 +27,24 @@ def get_config(given_cfg_path):
     return None
 
 
+def config_is_valid(config):
+    if config is None:
+        logging.error("No config file found !")
+        return False
+    with open(config, 'r') as config_file:
+        watcher_conf = yaml.load(config_file)
+        logging.error(f"Config: {watcher_conf}")
+        pa_home = watcher_conf['pa_home']
+        cred_f_path = watcher_conf['credential_file_path']
+        watch_folder = watcher_conf['watch_folder']
+        if (pa_home is not None and Path(pa_home).is_dir() and
+                cred_f_path is not None and Path(cred_f_path).is_file() and
+                watch_folder is not None and Path(watch_folder).is_dir()):
+            return True
+        logging.error("Invalid configuration !")
+        return False
+
+
 def setup_logging(loglevel):
     logging.basicConfig(level=loglevel,
                         format='%(asctime)s - %(name)s - %(message)s',
@@ -39,8 +58,8 @@ def main(argv=None):
         loglevel = logging.DEBUG
     setup_logging(loglevel)
     config = get_config(args.config)
-    if config is None:
-        logging.error("No config file found ! Exiting now...")
+    if not config_is_valid(config):
+        logging.error("Exiting now...")
         exit(1)
     my_event_handler = NSWatcher(config_path=config, debug=args.verbose)
     observer = Observer()

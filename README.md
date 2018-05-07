@@ -73,3 +73,27 @@ Adding such a file to the watch-folder will create the node source in the RM.
 Removing that file will also remove the node source from the RM.
 
 Run a `python -m nswatcher.main -v` to try.
+
+## Docker
+
+A dockerfile is provided to build an image:
+
+```bash
+docker build -t ns-watcher:dev .
+```
+
+The image embed the `ns-watcher.template.conf` file so you'll have to map those accordingly to your environment.
+~~An image is already pushed to the docker hub.~~
+Here's an example of how to run an ns-watcher container:
+
+```bash
+docker run --name ns-watcher --rm -it \
+  -v /home/paraita/.ns-watcher.conf:/home/.ns-watcher.conf \
+  -v /home/paraita/proactive:/root/proactive \
+  -v /home/paraita/ns-available:/root/ns-enabled \
+  paraita/ns-watcher:dev
+```
+
+> note: You will have to specify the `--net="host"` if your proactive instance is running on the same host
+
+> note: You will have to specify an extra volume mounting point if the credentials you want to use are not in your proactive folder
