@@ -83,7 +83,7 @@ docker build -t ns-watcher:dev .
 ```
 
 The image embed the `ns-watcher.template.conf` file so you'll have to map those accordingly to your environment.
-~~An image is already pushed to the docker hub.~~
+An image is already pushed to the [docker hub](https://hub.docker.com/r/paraita/ns-watcher/).
 Here's an example of how to run an ns-watcher container:
 
 ```bash
